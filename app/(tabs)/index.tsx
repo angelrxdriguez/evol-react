@@ -1,98 +1,251 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import {
+  Image,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { leerJsonSeguro, URL_API } from '@/constants/api';
+import { guardarUsuarioSesion, type UsuarioSesion } from '@/constants/sesion';
 
-export default function HomeScreen() {
+type UsuarioApi = {
+  id?: string;
+  nombreUsuario?: string;
+  es_admin?: number;
+  rol?: string;
+  nombre?: string;
+  apellidos?: string;
+};
+
+type RespuestaLogin = {
+  ok?: boolean;
+  error?: string;
+  user?: UsuarioApi;
+};
+
+function esUsuarioAdmin(usuario?: UsuarioApi) {
+  return Number(usuario?.es_admin) === 1;
+}
+
+function mapearUsuarioSesion(usuario?: UsuarioApi) {
+  const id = String(usuario?.id || '').trim();
+
+  if (!id) {
+    return null;
+  }
+
+  const usuarioSesion: UsuarioSesion = {
+    id,
+    nombreUsuario: String(usuario?.nombreUsuario || '').trim(),
+    nombre: String(usuario?.nombre || '').trim(),
+    apellidos: String(usuario?.apellidos || '').trim(),
+    es_admin: Number(usuario?.es_admin) === 1 ? 1 : 0,
+    rol: String(usuario?.rol || 'user').trim() || 'user',
+  };
+
+  return usuarioSesion;
+}
+
+export default function InicioScreen() {
+  const [usuarioEscrito, setUsuarioEscrito] = useState('');
+  const [contrasenaEscrita, setContrasenaEscrita] = useState('');
+  const [mensajeError, setMensajeError] = useState('');
+  const [cargando, setCargando] = useState(false);
+
+  async function entrar() {
+    if (cargando) {
+      return;
+    }
+
+    setMensajeError('');
+    setCargando(true);
+
+    try {
+      const response = await fetch(`${URL_API}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombreUsuario: usuarioEscrito.trim(),
+          contrasena: contrasenaEscrita,
+        }),
+      });
+
+      const data = await leerJsonSeguro<RespuestaLogin>(response);
+
+      if (!response.ok || !data.ok) {
+        setMensajeError(data.error || `No se pudo iniciar sesion (HTTP ${response.status})`);
+        return;
+      }
+
+      const usuarioSesion = mapearUsuarioSesion(data.user);
+
+      if (!usuarioSesion) {
+        setMensajeError('No se pudo guardar la sesion del usuario');
+        return;
+      }
+
+      guardarUsuarioSesion(usuarioSesion);
+
+      if (esUsuarioAdmin(data.user)) {
+        router.replace('/clases');
+        return;
+      }
+
+      router.replace('/home');
+    } catch {
+      setMensajeError('Error de red al iniciar sesion');
+    } finally {
+      setCargando(false);
+    }
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <ImageBackground
+      source={require('@/assets/images/banner_login2.jpg')}
+      style={styles.fondo}
+      resizeMode="cover">
+      <View style={styles.capaOscura}>
+        <KeyboardAvoidingView
+          style={styles.centrado}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <View style={styles.tarjeta}>
+            <View style={styles.contenedorLogo}>
+              <Image source={require('@/assets/images/evol_positivo.png')} style={styles.logo} />
+            </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+            <View style={styles.cajaLogin}>
+              <Text style={styles.titulo}>Iniciar sesion</Text>
+
+              <Text style={styles.etiqueta}>Usuario</Text>
+              <TextInput
+                style={styles.input}
+                value={usuarioEscrito}
+                onChangeText={setUsuarioEscrito}
+                placeholder="Escribe tu usuario"
+                placeholderTextColor="#95a0b1"
+                autoCapitalize="none"
+              />
+
+              <Text style={styles.etiqueta}>Contrasena</Text>
+              <TextInput
+                style={styles.input}
+                value={contrasenaEscrita}
+                onChangeText={setContrasenaEscrita}
+                placeholder="Escribe tu contrasena"
+                placeholderTextColor="#95a0b1"
+                secureTextEntry
+              />
+
+              {mensajeError ? <Text style={styles.textoError}>{mensajeError}</Text> : null}
+
+              <Pressable style={styles.botonEntrar} onPress={entrar}>
+                <Text style={styles.textoBoton}>{cargando ? 'Entrando...' : 'Entrar'}</Text>
+              </Pressable>
+
+              <Text style={styles.textoRegistro}>Aun no tienes cuenta?</Text>
+              <Pressable onPress={() => router.push('/registro')}>
+                <Text style={styles.enlaceRegistro}>Haz click aqui para registrarte</Text>
+              </Pressable>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  fondo: {
+    flex: 1,
+  },
+  capaOscura: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    padding: 18,
+    justifyContent: 'center',
+  },
+  centrado: {
+    width: '100%',
+  },
+  tarjeta: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#0b0f1a',
+  },
+  contenedorLogo: {
+    backgroundColor: '#22c55e',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    paddingVertical: 26,
+    paddingHorizontal: 18,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  logo: {
+    width: 170,
+    height: 56,
+    resizeMode: 'contain',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  cajaLogin: {
+    paddingHorizontal: 20,
+    paddingVertical: 22,
+  },
+  titulo: {
+    color: '#22c55e',
+    fontSize: 24,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  etiqueta: {
+    color: '#22c55e',
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  input: {
+    width: '100%',
+    backgroundColor: '#122037',
+    color: '#ffffff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
+    fontSize: 14,
+  },
+  textoError: {
+    color: '#ffb4b4',
+    marginBottom: 10,
+  },
+  botonEntrar: {
+    width: '100%',
+    backgroundColor: '#22c55e',
+    borderRadius: 8,
+    alignItems: 'center',
+    paddingVertical: 11,
+    marginTop: 4,
+  },
+  textoBoton: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  textoRegistro: {
+    marginTop: 14,
+    color: '#ffffff',
+    textAlign: 'center',
+    fontSize: 13,
+  },
+  enlaceRegistro: {
+    marginTop: 4,
+    color: '#22c55e',
+    textAlign: 'center',
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
 });
