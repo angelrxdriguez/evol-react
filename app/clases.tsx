@@ -1,9 +1,10 @@
 import { Asset } from 'expo-asset';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
+  Platform,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -12,6 +13,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
 import { leerJsonSeguro, URL_API } from '@/constants/api';
 
@@ -111,6 +113,31 @@ function crearFechaHoraIso(fecha: string, hora: string) {
   return fechaHora.toISOString();
 }
 
+function formatearFechaInput(fecha: Date) {
+  const anio = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return `${anio}-${mes}-${dia}`;
+}
+
+function formatearHoraInput(fecha: Date) {
+  const horas = String(fecha.getHours()).padStart(2, '0');
+  const minutos = String(fecha.getMinutes()).padStart(2, '0');
+  return `${horas}:${minutos}`;
+}
+
+function obtenerFechaBaseFormulario(formulario: FormularioClase) {
+  const fecha = formulario.fecha.trim();
+  const hora = formulario.hora.trim() || '00:00';
+
+  if (!fecha) {
+    return new Date();
+  }
+
+  const fechaBase = new Date(`${fecha}T${hora}`);
+  return Number.isNaN(fechaBase.getTime()) ? new Date() : fechaBase;
+}
+
 async function leerImagenEjemploBase64() {
   const asset = Asset.fromModule(require('@/assets/images/banner_login.jpg'));
   await asset.downloadAsync();
@@ -121,7 +148,7 @@ async function leerImagenEjemploBase64() {
   }
 
   return FileSystem.readAsStringAsync(uri, {
-    encoding: 'base64',
+    encoding: FileSystem.EncodingType.Base64,
   });
 }
 
@@ -137,6 +164,9 @@ export default function ClasesScreen() {
   const [listaInscritos, setListaInscritos] = useState<string[]>([]);
   const [cargandoInscritos, setCargandoInscritos] = useState(false);
   const [mensajeErrorInscritos, setMensajeErrorInscritos] = useState('');
+  const [pickerVisible, setPickerVisible] = useState(false);
+  const [pickerModo, setPickerModo] = useState<'date' | 'time'>('date');
+  const [pickerValor, setPickerValor] = useState(new Date());
 
   const formateadorFecha = useMemo(
     () =>
@@ -168,6 +198,27 @@ export default function ClasesScreen() {
 
   function reiniciarFormulario() {
     setFormulario(FORMULARIO_INICIAL);
+  }
+
+  function abrirPicker(modo: 'date' | 'time') {
+    setPickerModo(modo);
+    setPickerValor(obtenerFechaBaseFormulario(formulario));
+    setPickerVisible(true);
+  }
+
+  function manejarCambioPicker(event: DateTimePickerEvent, fechaSeleccionada?: Date) {
+    if (!fechaSeleccionada || event.type === 'dismissed') {
+      setPickerVisible(false);
+      return;
+    }
+
+    setPickerValor(fechaSeleccionada);
+    setFormulario((anterior) => ({
+      ...anterior,
+      fecha: pickerModo === 'date' ? formatearFechaInput(fechaSeleccionada) : anterior.fecha,
+      hora: pickerModo === 'time' ? formatearHoraInput(fechaSeleccionada) : anterior.hora,
+    }));
+    setPickerVisible(false);
   }
 
   const cargarClases = useCallback(async () => {
@@ -358,24 +409,28 @@ export default function ClasesScreen() {
           />
 
           <Text style={styles.etiqueta}>Fecha</Text>
-          <TextInput
-            style={styles.input}
-            value={formulario.fecha}
-            onChangeText={(valor) => setFormulario((anterior) => ({ ...anterior, fecha: valor }))}
-            placeholder="AAAA-MM-DD"
-            placeholderTextColor="#8392a7"
-            autoCapitalize="none"
-          />
+          <Pressable style={styles.inputSelector} onPress={() => abrirPicker('date')}>
+            <Text style={formulario.fecha ? styles.textoSelector : styles.textoSelectorPlaceholder}>
+              {formulario.fecha || 'Seleccionar fecha'}
+            </Text>
+          </Pressable>
 
           <Text style={styles.etiqueta}>Hora</Text>
-          <TextInput
-            style={styles.input}
-            value={formulario.hora}
-            onChangeText={(valor) => setFormulario((anterior) => ({ ...anterior, hora: valor }))}
-            placeholder="HH:MM"
-            placeholderTextColor="#8392a7"
-            autoCapitalize="none"
-          />
+          <Pressable style={styles.inputSelector} onPress={() => abrirPicker('time')}>
+            <Text style={formulario.hora ? styles.textoSelector : styles.textoSelectorPlaceholder}>
+              {formulario.hora || 'Seleccionar hora'}
+            </Text>
+          </Pressable>
+
+          {pickerVisible ? (
+            <DateTimePicker
+              value={pickerValor}
+              mode={pickerModo}
+              is24Hour
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={manejarCambioPicker}
+            />
+          ) : null}
 
           <Text style={styles.etiqueta}>Plazas maximas</Text>
           <TextInput
@@ -555,6 +610,24 @@ const styles = StyleSheet.create({
   },
   inputDescripcion: {
     minHeight: 90,
+  },
+  inputSelector: {
+    width: '100%',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(127, 180, 151, 0.28)',
+    backgroundColor: '#f2f5f8',
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    marginBottom: 10,
+  },
+  textoSelector: {
+    color: '#000000',
+    fontSize: 14,
+  },
+  textoSelectorPlaceholder: {
+    color: '#8392a7',
+    fontSize: 14,
   },
   textoAyuda: {
     color: '#93a4ba',

@@ -1,9 +1,9 @@
 import dotenv from 'dotenv'
-import path from 'node:path'
-import fs from 'node:fs/promises'
-import { fileURLToPath } from 'node:url'
 import express from 'express'
 import { MongoClient, ObjectId } from 'mongodb'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -20,7 +20,7 @@ let usuariosCollection
 let clasesCollection
 
 const { PORT } = process.env
-const SERVER_PORT = Number(PORT) || 3002
+const SERVER_PORT = Number(PORT) || 3003
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
