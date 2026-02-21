@@ -31,11 +31,19 @@ export default function RegistroScreen() {
 
   function validarContrasenas() {
     if (!contrasenaNueva) {
-      return 'La contrasena esta vacia o no coincide';
+      return 'La contraseña es obligatoria';
+    }
+
+    if (contrasenaNueva.length < 6) {
+      return 'La contraseña debe tener al menos 6 caracteres';
+    }
+
+    if (!repetirContrasenaNueva) {
+      return 'Repite la contraseña';
     }
 
     if (contrasenaNueva !== repetirContrasenaNueva) {
-      return 'La contrasena esta vacia o no coincide';
+      return 'Las contraseñas no coinciden';
     }
 
     return '';
@@ -85,7 +93,7 @@ export default function RegistroScreen() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/banner_login2.jpg')}
+      source={require('@/assets/images/evol_negro.png')}
       style={styles.fondo}
       resizeMode="cover">
       <View style={styles.capaOscura}>
@@ -94,59 +102,25 @@ export default function RegistroScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <View style={styles.tarjeta}>
             <View style={styles.contenedorLogo}>
-              <Image source={require('@/assets/images/evol_positivo.png')} style={styles.logo} />
+              <Image source={require('@/assets/images/evol_negro.png')} style={styles.logo} />
             </View>
 
             <ScrollView style={styles.cajaFormulario} keyboardShouldPersistTaps="handled">
               <Text style={styles.titulo}>Bienvenido</Text>
 
               <Text style={styles.etiqueta}>Nombre de usuario</Text>
-              <TextInput
-                style={styles.input}
-                value={usuarioNuevo}
-                onChangeText={setUsuarioNuevo}
-                placeholder="Escribe tu nombre de usuario"
-                placeholderTextColor="#95a0b1"
-                autoCapitalize="none"
-              />
+              <TextInput style={styles.input}value={usuarioNuevo}onChangeText={setUsuarioNuevo}placeholder="Escribe tu nombre de usuario"placeholderTextColor="#95a0b1"autoCapitalize="none"/>
 
               <Text style={styles.etiqueta}>Nombre</Text>
-              <TextInput
-                style={styles.input}
-                value={nombreNuevo}
-                onChangeText={setNombreNuevo}
-                placeholder="Escribe tu nombre"
-                placeholderTextColor="#95a0b1"
-              />
-
+              <TextInput style={styles.input}value={nombreNuevo}onChangeText={setNombreNuevo}placeholder="Escribe tu nombre"placeholderTextColor="#95a0b1"/>
               <Text style={styles.etiqueta}>Apellidos</Text>
-              <TextInput
-                style={styles.input}
-                value={apellidosNuevos}
-                onChangeText={setApellidosNuevos}
-                placeholder="Escribe tus apellidos"
-                placeholderTextColor="#95a0b1"
-              />
+              <TextInput style={styles.input}value={apellidosNuevos}onChangeText={setApellidosNuevos}placeholder="Escribe tus apellidos"placeholderTextColor="#95a0b1"/>
 
-              <Text style={styles.etiqueta}>Contrasena</Text>
-              <TextInput
-                style={styles.input}
-                value={contrasenaNueva}
-                onChangeText={setContrasenaNueva}
-                placeholder="Escribe tu contrasena"
-                placeholderTextColor="#95a0b1"
-                secureTextEntry
-              />
+              <Text style={styles.etiqueta}>Contraseña</Text>
+              <TextInput style={styles.input}value={contrasenaNueva}onChangeText={setContrasenaNueva}placeholder="Escribe tu contraseña"placeholderTextColor="#95a0b1"secureTextEntry/>
 
-              <Text style={styles.etiqueta}>Repetir contrasena</Text>
-              <TextInput
-                style={styles.input}
-                value={repetirContrasenaNueva}
-                onChangeText={setRepetirContrasenaNueva}
-                placeholder="Repite tu contrasena"
-                placeholderTextColor="#95a0b1"
-                secureTextEntry
-              />
+              <Text style={styles.etiqueta}>Repetir contraseña</Text>
+              <TextInput style={styles.input}value={repetirContrasenaNueva}onChangeText={setRepetirContrasenaNueva}placeholder="Repite tu contraseña"placeholderTextColor="#95a0b1"secureTextEntry/>
 
               <Pressable style={styles.boton} onPress={crearCuenta}>
                 <Text style={styles.textoBoton}>{cargando ? 'Creando...' : 'Crear cuenta'}</Text>
@@ -154,7 +128,7 @@ export default function RegistroScreen() {
 
               {mensajeError ? <Text style={styles.textoError}>{mensajeError}</Text> : null}
 
-              <Text style={styles.textoInicio}>Ya tienes cuenta?</Text>
+              <Text style={styles.textoInicio}>¿Ya tienes cuenta?</Text>
               <Pressable onPress={() => router.replace('/')}>
                 <Text style={styles.enlaceInicio}>Haz click aqui para iniciar sesion</Text>
               </Pressable>
