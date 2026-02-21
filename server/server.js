@@ -425,5 +425,23 @@ app.get('/debug/usuarios', async (_, res) => {
 
 app.get('/health', (_, res) => res.send('ok'))
 
-connectMongo().catch(() => {})
-app.listen(SERVER_PORT)
+connectMongo()
+  .then(() => {
+    console.log('conectado')
+  })
+  .catch((error) => {
+    console.error('error cone:', error?.message || error)
+  })
+
+const server = app.listen(SERVER_PORT, () => {
+  console.log(`puerto http://localhost:${SERVER_PORT}`)
+})
+
+server.on('error', (error) => {
+  if (error?.code === 'EADDRINUSE') {
+    process.exit(1)
+  }
+
+  console.error('error:', error?.message || error)
+  process.exit(1)
+})

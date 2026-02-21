@@ -267,7 +267,7 @@ export default function InscribirClaseScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.contenido}>
-        <Text style={styles.titulo}>Clases de hoy</Text>
+        <Text style={styles.titulo}>Clases Disponibles</Text>
 
         {okMsg ? <Text style={styles.estadoOk}>{okMsg}</Text> : null}
         {cargando ? (

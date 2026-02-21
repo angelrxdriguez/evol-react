@@ -17,7 +17,7 @@ function obtenerHostLocal() {
 }
 
 export const URL_API =
-  process.env.EXPO_PUBLIC_API_URL?.trim() || `http://${obtenerHostLocal()}:3002`;
+  process.env.EXPO_PUBLIC_API_URL?.trim() || `http://${obtenerHostLocal()}:3003`;
 
 export async function leerJsonSeguro<T = Record<string, unknown>>(response: Response): Promise<T> {
   const texto = await response.text();
