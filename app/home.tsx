@@ -34,17 +34,17 @@ export default function HomeScreen() {
 
             <View style={styles.grid}>
               <View style={styles.ventaja}>
-                <Text style={styles.icono}>+</Text>
+                <Image source={require('@/assets/ico/plus.png')} style={styles.iconoVentaja} />
                 <Text style={styles.textoVentaja}>Inscribete a clases en pocos pasos.</Text>
               </View>
 
               <View style={styles.ventaja}>
-                <Text style={styles.icono}>OK</Text>
+                <Image source={require('@/assets/ico/task.png')} style={styles.iconoVentaja} />
                 <Text style={styles.textoVentaja}>Gestiona tus clases y horarios.</Text>
               </View>
 
               <View style={styles.ventaja}>
-                <Text style={styles.icono}>!</Text>
+                <Image source={require('@/assets/ico/new.png')} style={styles.iconoVentaja} />
                 <Text style={styles.textoVentaja}>Consulta novedades y avisos del gimnasio.</Text>
               </View>
             </View>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   intro: {
-    marginTop: 34,
+    marginTop: 205,
     marginHorizontal: 16,
     borderRadius: 12,
     padding: 18,
@@ -112,12 +112,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
-  icono: {
-    color: '#22c55e',
-    fontSize: 16,
-    fontWeight: '700',
-    minWidth: 22,
-    textAlign: 'center',
+  iconoVentaja: {
+    width: 22,
+    height: 22,
+    resizeMode: 'contain',
   },
   textoVentaja: {
     color: '#ffffff',

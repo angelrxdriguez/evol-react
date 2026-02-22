@@ -127,7 +127,6 @@ app.post('/registro', async (req, res) => {
       apellidos: apellidosLimpio,
       contrasena: contrasenaHash,
       es_admin: 0,
-      rol: 'user',
       createdAt: new Date(),
     })
 
