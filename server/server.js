@@ -172,7 +172,6 @@ app.post('/login', async (req, res) => {
         id: String(user._id),
         nombreUsuario: user.nombreUsuario,
         es_admin: esAdmin,
-        rol: user.rol || 'user',
         nombre: user.nombre || '',
         apellidos: user.apellidos || '',
       },
