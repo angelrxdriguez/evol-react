@@ -50,7 +50,7 @@ function idAString(valor) {
   return String(valor).trim()
 }
 
-async function guardarImagenEnUploads(nombreArchivo, imagenContenidoBase64) {
+async function guardarImagen(nombreArchivo, imagenContenidoBase64) {
   const nombreLimpio = limpiarNombreArchivo(nombreArchivo)
   if (!nombreLimpio) {
     throw new Error('Nombre de imagen invalido')
@@ -234,7 +234,7 @@ app.post('/clases', async (req, res) => {
       return res.status(400).json({ ok: false, error: 'Contenido de imagen obligatorio' })
     }
 
-    const nombreImagenGuardada = await guardarImagenEnUploads(imagen, imagenContenido)
+    const nombreImagenGuardada = await guardarImagen(imagen, imagenContenido)
 
     const nuevaClase = {
       nombre,
