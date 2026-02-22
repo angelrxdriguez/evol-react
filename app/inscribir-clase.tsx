@@ -8,6 +8,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  ToastAndroid,
   View,
 } from 'react-native';
 
@@ -246,6 +247,7 @@ export default function InscribirClaseScreen() {
         setOkMsg('Ya estabas inscrito en esta clase');
       } else {
         setOkMsg('Inscripcion realizada');
+        ToastAndroid.show('Inscrito correctamente !', ToastAndroid.SHORT);
       }
 
       await cargarClasesHoy();

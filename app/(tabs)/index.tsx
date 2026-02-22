@@ -117,7 +117,7 @@ export default function InicioScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <View style={styles.tarjeta}>
             <View style={styles.contenedorLogo}>
-              <Image source={require('@/assets/images/evol_positivo.png')} style={styles.logo} />
+              <Image source={require('@/assets/images/evol_negro.png')} style={styles.logo} />
             </View>
 
             <View style={styles.cajaLogin}>

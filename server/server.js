@@ -1,10 +1,10 @@
+import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 import express from 'express'
 import { MongoClient, ObjectId } from 'mongodb'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import bcrypt from 'bcrypt'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -103,7 +103,7 @@ app.post('/registro', async (req, res) => {
     }
 
     if (!contrasena) {
-      return res.status(400).json({ ok: false, error: 'La contrasena es obligatoria' })
+      return res.status(400).json({ ok: false, error: 'La contraseña es obligatoria' })
     }
 
     if (!usuariosCollection) {
@@ -156,13 +156,13 @@ app.post('/login', async (req, res) => {
     const user = await usuariosCollection.findOne({ nombreUsuario })
 
     if (!user) {
-      return res.status(401).json({ ok: false, error: 'Usuario o contrasena incorrectos' })
+      return res.status(401).json({ ok: false, error: 'Usuario o contraseña incorrectos' })
     }
 
     const contrasenaValida = await bcrypt.compare(String(contrasena), String(user.contrasena || ''))
 
     if (!contrasenaValida) {
-      return res.status(401).json({ ok: false, error: 'Usuario o contrasena incorrectos' })
+      return res.status(401).json({ ok: false, error: 'Usuario o contraseña incorrectos' })
     }
 
     const esAdmin = Number(user.es_admin) === 1 ? 1 : 0

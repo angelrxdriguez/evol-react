@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -93,7 +92,7 @@ export default function RegistroScreen() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/evol_negro.png')}
+      source={require('@/assets/images/banner_login2.jpg')}
       style={styles.fondo}
       resizeMode="cover">
       <View style={styles.capaOscura}>
@@ -105,7 +104,7 @@ export default function RegistroScreen() {
               <Image source={require('@/assets/images/evol_negro.png')} style={styles.logo} />
             </View>
 
-            <ScrollView style={styles.cajaFormulario} keyboardShouldPersistTaps="handled">
+            <View style={styles.cajaFormulario}>
               <Text style={styles.titulo}>Bienvenido</Text>
 
               <Text style={styles.etiqueta}>Nombre de usuario</Text>
@@ -132,7 +131,7 @@ export default function RegistroScreen() {
               <Pressable onPress={() => router.replace('/')}>
                 <Text style={styles.enlaceInicio}>Haz click aqui para iniciar sesion</Text>
               </Pressable>
-            </ScrollView>
+            </View>
           </View>
         </KeyboardAvoidingView>
       </View>
@@ -174,7 +173,6 @@ const styles = StyleSheet.create({
   cajaFormulario: {
     paddingHorizontal: 20,
     paddingVertical: 20,
-    maxHeight: 560,
   },
   titulo: {
     color: '#22c55e',
